@@ -17,11 +17,21 @@ class BestFirstSearch {
     }
 
     static class Graph {
-        private final Map<String, List<Node>> adjList = new HashMap<>();
+        private final List<Edge> edges = new ArrayList<>();
+
+        static class Edge {
+            String from, to;
+            int heuristic;
+
+            Edge(String from, String to, int heuristic) {
+                this.from = from;
+                this.to = to;
+                this.heuristic = heuristic;
+            }
+        }
 
         void addEdge(String from, String to, int heuristic) {
-            adjList.putIfAbsent(from, new ArrayList<>());
-            adjList.get(from).add(new Node(to, heuristic));
+            edges.add(new Edge(from, to, heuristic));
         }
 
         void bestFirstSearch(String start, String goal) {
@@ -45,10 +55,9 @@ class BestFirstSearch {
                     return;
                 }
 
-                List<Node> neighbors = adjList.getOrDefault(current.name, new ArrayList<>());
-                for (Node neighbor : neighbors) {
-                    if (!visited.contains(neighbor.name)) {
-                        pq.add(neighbor);
+                for (Edge edge : edges) {
+                    if (edge.from.equals(current.name) && !visited.contains(edge.to)) {
+                        pq.add(new Node(edge.to, edge.heuristic));
                     }
                 }
             }
