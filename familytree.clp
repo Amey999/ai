@@ -1,3 +1,4 @@
+%Family Tree
 % Defining males and females
 male(baliramji).
 male(namdev).
@@ -186,3 +187,192 @@ find_relation(Person1, Person2, Relation) :-
     ; mother_in_law(Person1, Person2) -> Relation = 'mother-in-law'
     ; Relation = 'no direct relation'  % Default case if no relation is found
     ).
+
+
+    --------------------------------------------------------------------------------------------
+
+
+    % Family Tree
+% Defining males and females
+male(baliramji). male(namdev). male(sukhdeo). male(eknath). male(ram).
+male(prashant). male(suresh). male(shrikant). male(pramod). male(ankush).
+male(roshan). male(ninad). male(anil). male(praveen). male(dadu).
+male(aaryan). male(amey). male(shrivesh). male(tushar). male(rudra).
+
+female(kamla). female(usha). female(sarika). female(jaymala). female(kavita).
+female(surekanta). female(kalyani). female(nilima). female(harsha). female(nita).
+female(asha). female(roshni). female(dipali). female(aarti). female(sayli).
+female(poonam). female(swara).
+
+% Defining parent-child relationships
+parent(baliramji, usha). parent(baliramji, namdev). parent(baliramji, sukhdeo).
+parent(baliramji, eknath). parent(baliramji, ram).
+
+parent(kamla, usha). parent(kamla, namdev). parent(kamla, sukhdeo).
+parent(kamla, eknath). parent(kamla, ram).
+
+parent(usha, ankush). parent(usha, roshan). parent(prashant, ankush).
+parent(prashant, roshan).
+
+parent(roshan, rudra). parent(kalyani, rudra).
+
+parent(namdev, suresh). parent(sarika, suresh).
+
+parent(suresh, sayli). parent(suresh, aaryan). parent(nilima, sayli).
+parent(nilima, aaryan).
+
+parent(sukhdeo, shrikant). parent(sukhdeo, pramod). parent(jaymala, shrikant).
+parent(jaymala, pramod).
+
+parent(shrikant, amey). parent(shrikant, shrivesh). parent(harsha, amey).
+parent(harsha, shrivesh).
+
+parent(pramod, sakshi). parent(pramod, aashay). parent(nita, sakshi).
+parent(nita, aashay).
+
+parent(eknath, asha). parent(eknath, rahul). parent(kavita, asha).
+parent(kavita, rahul).
+
+parent(asha, poonam). parent(asha, tushar). parent(sanket, poonam).
+parent(sanket, tushar).
+
+parent(rahul, ninad). parent(roshni, ninad).
+
+parent(ram, anil). parent(ram, praveen). parent(surekanta, anil).
+parent(surekanta, praveen).
+
+parent(anil, dadu). parent(dipali, dadu).
+
+parent(praveen, swara). parent(praveen, anav). parent(aarti, swara).
+parent(aarti, anav).
+
+% Basic family relationships
+father(X, Y) :- male(X), parent(X, Y).
+mother(X, Y) :- female(X), parent(X, Y).
+child(X, Y) :- parent(Y, X).
+sibling(X, Y) :- parent(Z, X), parent(Z, Y), X \= Y.
+brother(X, Y) :- male(X), sibling(X, Y).
+sister(X, Y) :- female(X), sibling(X, Y).
+grandparent(X, Y) :- parent(X, Z), parent(Z, Y).
+grandfather(X, Y) :- male(X), grandparent(X, Y).
+grandmother(X, Y) :- female(X), grandparent(X, Y).
+wife(X, Y) :- female(X), male(Y), parent(X, Z), parent(Y, Z).
+husband(X, Y) :- male(X), female(Y), parent(X, Z), parent(Y, Z).
+niece(X, Y) :- female(X), sibling(Y, Z), parent(Z, X).
+nephew(X, Y) :- male(X), sibling(Y, Z), parent(Z, X).
+cousin(X, Y) :- parent(A, X), parent(B, Y), sibling(A, B).
+
+% Querying parents, grandparents, and cousins
+
+% Find the relationship between two persons
+find_relation(X, Y) :-
+    (   father(X, Y) -> format('~w is the father of ~w.~n', [X, Y])
+    ;   mother(X, Y) -> format('~w is the mother of ~w.~n', [X, Y])
+    ;   brother(X, Y) -> format('~w is the brother of ~w.~n', [X, Y])
+    ;   sister(X, Y) -> format('~w is the sister of ~w.~n', [X, Y])
+    ;   husband(X, Y) -> format('~w is the husband of ~w.~n', [X, Y])
+    ;   wife(X, Y) -> format('~w is the wife of ~w.~n', [X, Y])
+    ;   child(X, Y) -> format('~w is the child of ~w.~n', [X, Y])
+    ;   grandparent(X, Y) -> format('~w is the grandparent of ~w.~n', [X, Y])
+    ;   grandfather(X, Y) -> format('~w is the grandfather of ~w.~n', [X, Y])
+    ;   grandmother(X, Y) -> format('~w is the grandmother of ~w.~n', [X, Y])
+    ;   cousin(X, Y) -> format('~w is the cousin of ~w.~n', [X, Y])
+    ;   sibling(X, Y) -> format('~w is the sibling of ~w.~n', [X, Y])
+    ;   format('No direct relationship found between ~w and ~w.~n', [X, Y])
+    ).
+
+% Query for Parents
+find_parents(Person) :- 
+    setof(Parent, parent(Parent, Person), Parents),
+    format('~w\'s parents are: ~w.~n', [Person, Parents]).
+
+% Query for Grandparents
+find_grandparents(Person) :- 
+    setof(GP, grandparent(GP, Person), Grandparents),
+    format('~w\'s grandparents are: ~w.~n', [Person, Grandparents]).
+
+% Query for Cousins
+find_cousins(Person) :- 
+    setof(C, cousin(Person, C), Cousins),
+    format('~w\'s cousins are: ~w.~n', [Person, Cousins]).
+
+% Query for Siblings
+find_siblings(Person) :- 
+    setof(Sibling, sibling(Sibling, Person), Siblings),
+    format('~w\'s siblings are: ~w.~n', [Person, Siblings]).
+
+% Query for Brothers
+find_brothers(Person) :-
+    (   setof(Brother, brother(Brother, Person), Brothers)
+    ->  format('~w\'s brothers are: ~w.~n', [Person, Brothers])
+    ;   format('~w has no brothers.~n', [Person])
+    ).
+
+
+% Query for Sisters
+find_sisters(Person) :-
+    (   setof(Sister, sister(Sister, Person), Sisters)
+    ->  format('~w\'s sisters are: ~w.~n', [Person, Sisters])
+    ;   format('~w has no sisters.~n', [Person])
+    ).
+
+
+% Query for Aunts
+find_aunts(Person) :- 
+    setof(Aunt, (sister(Aunt, Parent), parent(Parent, Person)), Aunts),
+    format('~w\'s aunts are: ~w.~n', [Person, Aunts]).
+
+% Query for Uncles
+find_uncles(Person) :- 
+    setof(Uncle, (brother(Uncle, Parent), parent(Parent, Person)), Uncles),
+    format('~w\'s uncles are: ~w.~n', [Person, Uncles]).
+
+% Query for Nieces
+find_nieces(Person) :- 
+    setof(Niece, (niece(Niece, Person)), Nieces),
+    format('~w\'s nieces are: ~w.~n', [Person, Nieces]).
+
+% Query for Nephews
+find_nephews(Person) :- 
+    setof(Nephew, (nephew(Nephew, Person)), Nephews),
+    format('~w\'s nephews are: ~w.~n', [Person, Nephews]).
+
+% Query for Grandfathers
+find_grandfathers(Person) :- 
+    setof(GF, grandfather(GF, Person), Grandfathers),
+    format('~w\'s grandfathers are: ~w.~n', [Person, Grandfathers]).
+
+% Query for Grandmothers
+find_grandmothers(Person) :- 
+    setof(GM, grandmother(GM, Person), Grandmothers),
+    format('~w\'s grandmothers are: ~w.~n', [Person, Grandmothers]).
+
+% Query for Husbands
+find_husband(Person) :- 
+    setof(Husband, husband(Husband, Person), Husbands),
+    format('~w\'s husband is: ~w.~n', [Person, Husbands]).
+
+% Query for Wives
+find_wife(Person) :- 
+    setof(Wife, wife(Wife, Person), Wives),
+    format('~w\'s wife is: ~w.~n', [Person, Wives]).
+
+% Main entry point for OneCompiler compatibility
+:- initialization(main).
+
+main :-
+    % Example queries for testing
+    find_relation(ankush, usha),
+
+    find_parents(ankush),
+    find_grandparents(ankush),
+    find_siblings(ankush),
+    find_brothers(ankush),
+    find_sisters(ankush),
+    find_cousins(ankush),
+    find_aunts(ankush),
+    find_uncles(ankush),
+    find_nieces(ankush),
+    find_nephews(ankush),
+    find_grandfathers(ankush),
+    find_grandmothers(ankush).
